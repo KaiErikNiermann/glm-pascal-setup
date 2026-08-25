@@ -1,0 +1,33 @@
+# systemd --user unit. install_service.sh substitutes @@PLACEHOLDERS@@.
+# Installed to ~/.config/systemd/user/llama-glm.service
+[Unit]
+Description=GLM-4.7-Flash via llama.cpp (CUDA sm_61) on a GTX 1080 Ti
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=@@REPO_ROOT@@/scripts/serve.sh
+
+# This config deliberately keeps most experts in CPU RAM, so on a 16 GiB box the
+# server is the largest memory consumer by far. Cap it with cgroups so a runaway
+# cannot take the whole machine down -- MemoryHigh throttles, MemoryMax kills.
+# Tune to leave headroom for whatever else the box runs.
+MemoryHigh=11G
+MemoryMax=13G
+OOMPolicy=stop
+
+Restart=always
+# Long backoff on purpose: if it died from memory pressure, restarting instantly
+# just recreates the pressure. Give the box room to settle.
+RestartSec=30
+StartLimitIntervalSec=600
+StartLimitBurst=5
+
+StandardOutput=append:@@LLM_ROOT@@/logs/service.log
+StandardError=append:@@LLM_ROOT@@/logs/service.log
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target
