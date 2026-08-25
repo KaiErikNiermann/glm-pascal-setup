@@ -1,0 +1,54 @@
+name: asset-liveness
+
+# The guide tells people to download things we deliberately do not vendor.
+# This job is the tripwire: when an upstream artifact disappears, CI goes red and
+# an issue is opened, so the guide gets fixed or deprecated instead of silently
+# rotting into an afternoon-waster.
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"   # 06:00 UTC, 1st of every month
+  workflow_dispatch:      # and on demand
+  push:
+    paths:
+      - "assets.json"
+      - "tools/check_assets.py"
+      - ".github/workflows/asset-liveness.yml"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check every external asset still resolves
+        id: check
+        run: python3 tools/check_assets.py | tee result.txt
+
+      - name: Open an issue if something vanished
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Asset liveness check failed ($(date -u +%Y-%m-%d))"
+          # Don't pile up duplicates month after month -- reuse the open one.
+          existing=$(gh issue list --state open --label asset-liveness \
+                       --json number --jq '.[0].number' || true)
+          body=$(printf 'The monthly asset check failed.\n\n```\n%s\n```\n\nRun: %s' \
+                   "$(cat result.txt || echo 'no output captured')" \
+                   "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh label create asset-liveness --color b60205 \
+              --description "An upstream download went away" 2>/dev/null || true
+            gh issue create --title "$title" --label asset-liveness --body "$body"
+          fi
