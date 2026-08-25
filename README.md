@@ -1,5 +1,8 @@
 # GLM-4.7-Flash on a GTX 1080 Ti
 
+[![asset-liveness](https://github.com/KaiErikNiermann/glm-pascal-setup/actions/workflows/asset-liveness.yml/badge.svg)](https://github.com/KaiErikNiermann/glm-pascal-setup/actions/workflows/asset-liveness.yml)
+[![lint](https://github.com/KaiErikNiermann/glm-pascal-setup/actions/workflows/lint.yml/badge.svg)](https://github.com/KaiErikNiermann/glm-pascal-setup/actions/workflows/lint.yml)
+
 A reproducible, scripted setup for running a 31B-parameter MoE coding model at
 **~26 tok/s** on a 2017 gaming PC — one Pascal GPU, 11 GiB of VRAM, 16 GiB of
 system RAM, no cloud, no API key.
