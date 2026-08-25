@@ -1,0 +1,23 @@
+[project]
+name = "glm-pascal-setup"
+version = "1.0.0"
+description = "Reproducible GLM-4.7-Flash setup for a GTX 1080 Ti"
+requires-python = ">=3.11"
+# Intentionally no runtime dependencies: tools/ is stdlib-only so that CI and a
+# fresh box can run the checks without creating a venv first.
+dependencies = []
+
+[dependency-groups]
+dev = ["ruff>=0.14", "pyright>=1.1.400"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.pyright]
+include = ["tools"]
+typeCheckingMode = "strict"
+pythonVersion = "3.11"

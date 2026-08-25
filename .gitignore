@@ -1,0 +1,10 @@
+# Local machine configuration -- never commit; may contain a LAN address.
+config/settings.env
+
+# Nothing large or generated belongs in this repo.
+*.gguf
+*.log
+__pycache__/
+*.py[cod]
+.venv/
+.ruff_cache/

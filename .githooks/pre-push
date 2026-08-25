@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Lint and type-check before anything leaves the machine.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+fail=0
+
+if command -v shellcheck >/dev/null 2>&1; then
+  shellcheck -x scripts/*.sh .githooks/pre-push || fail=1
+else
+  echo "pre-push: shellcheck not installed, skipping shell lint" >&2
+fi
+
+if command -v ruff >/dev/null 2>&1; then
+  ruff check tools/ || fail=1
+  ruff format --check tools/ || fail=1
+else
+  echo "pre-push: ruff not installed, skipping python lint" >&2
+fi
+
+if command -v pyright >/dev/null 2>&1; then
+  pyright tools/ || fail=1
+else
+  echo "pre-push: pyright not installed, skipping type check" >&2
+fi
+
+# The manifest is the whole point of the repo's CI; a syntax error in it is fatal.
+python3 -c 'import json,pathlib; json.loads(pathlib.Path("assets.json").read_text())' || fail=1
+
+[ "$fail" -eq 0 ] || { echo "pre-push: checks failed, push aborted" >&2; exit 1; }
