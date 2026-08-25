@@ -1,0 +1,38 @@
+{
+  "_comment": "Every external artifact this guide tells you to download. CI checks these monthly so the guide fails loudly when something disappears, rather than silently rotting. Deliberately NOT vendored into the repo -- redistributing a 17 GiB GGUF and NVIDIA drivers is both impractical and a licensing question we would rather not answer.",
+  "assets": [
+    {
+      "name": "GLM-4.7-Flash GGUF (UD-Q4_K_XL)",
+      "kind": "hf_file",
+      "repo": "unsloth/GLM-4.7-Flash-GGUF",
+      "file": "GLM-4.7-Flash-UD-Q4_K_XL.gguf",
+      "why": "The model itself. ~17 GiB."
+    },
+    {
+      "name": "llama.cpp release tag",
+      "kind": "github_release",
+      "repo": "ggml-org/llama.cpp",
+      "tag": "b10612",
+      "why": "Pinned inference engine. Newer tags usually work; flag names drift."
+    },
+    {
+      "name": "CUDA 12.6 devel image",
+      "kind": "docker_image",
+      "image": "nvidia/cuda",
+      "tag": "12.6.3-devel-ubuntu22.04",
+      "why": "Build toolchain. CUDA 13 dropped Pascal, so a 12.x image is mandatory."
+    },
+    {
+      "name": "nvidia-580xx-dkms (AUR)",
+      "kind": "aur_package",
+      "package": "nvidia-580xx-dkms",
+      "why": "580 is the last driver branch supporting Pascal. Mainline Arch nvidia has moved past it."
+    },
+    {
+      "name": "nvidia-580xx-utils (AUR)",
+      "kind": "aur_package",
+      "package": "nvidia-580xx-utils",
+      "why": "Userspace half of the 580xx driver."
+    }
+  ]
+}
