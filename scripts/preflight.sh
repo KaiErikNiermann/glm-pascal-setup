@@ -70,11 +70,13 @@ fi
 
 log "Tools"
 for t in git curl awk; do
-  command -v "$t" >/dev/null 2>&1 && ok "$t" || note "$t missing"
+  if command -v "$t" >/dev/null 2>&1; then ok "$t"; else note "$t missing"; fi
 done
-command -v hf >/dev/null 2>&1 \
-  && ok "hf (huggingface CLI)" \
-  || warn "hf not found -- fetch_model.sh will fall back to curl. pip install huggingface_hub[hf_transfer]"
+if command -v hf >/dev/null 2>&1; then
+  ok "hf (huggingface CLI)"
+else
+  warn "hf not found -- fetch_model.sh falls back to curl. pip install 'huggingface_hub[hf_transfer]'"
+fi
 
 echo
 if [ "$fail" -gt 0 ]; then

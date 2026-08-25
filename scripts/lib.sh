@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-_c() { [ -t 2 ] && printf '\033[%sm' "$1" >&2 || true; }
+_c() { if [ -t 2 ]; then printf '\033[%sm' "$1" >&2; fi; }
 log()  { _c '0;36'; printf '==> %s\n' "$*" >&2; _c '0'; }
 ok()   { _c '0;32'; printf '  ok  %s\n' "$*" >&2; _c '0'; }
 warn() { _c '0;33'; printf '  !!  %s\n' "$*" >&2; _c '0'; }

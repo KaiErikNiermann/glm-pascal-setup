@@ -15,8 +15,9 @@ jobs:
       - name: shellcheck
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
-          # lib.sh is sourced, not executed; -x follows the source directives.
-          shellcheck -x scripts/*.sh
+          # -x follows sourced files; -P SCRIPTDIR resolves the $(dirname ...)
+          # source path in each script back to scripts/lib.sh.
+          shellcheck -x -P SCRIPTDIR scripts/*.sh
 
   python:
     runs-on: ubuntu-latest
